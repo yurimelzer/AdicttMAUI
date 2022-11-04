@@ -1,5 +1,6 @@
 ﻿using AdicttMAUI.Models;
 using SQLite;
+using SQLiteNetExtensions.Extensions;
 using SQLiteNetExtensionsAsync.Extensions;
 using System;
 using System.Collections.Generic;
@@ -15,28 +16,38 @@ namespace AdicttMAUI.Repositories
 
         public string StatusMessage { get; set; }
 
-        private SQLiteAsyncConnection sqlConnection;
+        private SQLiteAsyncConnection sqlConnectionAsync;
 
-        private async Task Init()
+        private SQLiteConnection sqlConnection;
+        private async Task InitAsync()
+        {
+            if (sqlConnectionAsync != null)
+                return;
+
+            sqlConnectionAsync = new SQLiteAsyncConnection(_dbPath);
+            await sqlConnectionAsync.CreateTableAsync<Product>();
+        }
+
+        private void Init()
         {
             if (sqlConnection != null)
                 return;
 
-            sqlConnection = new SQLiteAsyncConnection(_dbPath);
-            await sqlConnection.CreateTableAsync<Product>();
-        }
+            sqlConnection = new SQLiteConnection(_dbPath);
+            sqlConnection.CreateTable<Product>();
 
+        }
         public ProductRepository(string dbPath)
         {
             _dbPath = dbPath;
         }   
 
-        public async Task<List<Product>> GetAllProduct()
+        public List<Product> GetAllProduct()
         {
             try
             {
-                await Init();
-                return await sqlConnection.GetAllWithChildrenAsync<Product>();
+                Init();
+                return sqlConnection.GetAllWithChildren<Product>();
             }
             catch (Exception ex)
             {
@@ -50,8 +61,8 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
-                return await sqlConnection.GetAsync<Product>(id);
+                await InitAsync();
+                return await sqlConnectionAsync.GetAsync<Product>(id);
             }
             catch (Exception ex)
             {
@@ -65,9 +76,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.InsertAsync(product);
+                await sqlConnectionAsync.InsertAsync(product);
 
                 StatusMessage = String.Format("Product {0} has been added", product.id);
             }
@@ -82,9 +93,9 @@ namespace AdicttMAUI.Repositories
             int result = 0;
             try
             {
-                await Init();
+                await InitAsync();
 
-                result = await sqlConnection.InsertAllAsync(listProducts);
+                result = await sqlConnectionAsync.InsertAllAsync(listProducts);
 
                 StatusMessage = String.Format("{0} Product(s) has been added", result);
             }
@@ -98,9 +109,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.UpdateWithChildrenAsync(product);
+                await sqlConnectionAsync.UpdateWithChildrenAsync(product);
 
                 StatusMessage = String.Format("Product {0} as been updated", product.id);
             }
@@ -114,9 +125,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.DeleteAsync<Product>(id);
+                await sqlConnectionAsync.DeleteAsync<Product>(id);
 
                 StatusMessage = String.Format("Product {0} has been deleted", id);
             }

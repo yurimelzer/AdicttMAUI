@@ -13,7 +13,7 @@ namespace AdicttMAUI.Models
 
         [ForeignKey(typeof(Product))]
         public long productId { get; set; }
-        public string source { get; set; }
+        public string imageSource { get; set; }
         public int position { get; set; }
         public DateTime? createdAt { get; set; }
         public DateTime? updatedAt { get; set; }

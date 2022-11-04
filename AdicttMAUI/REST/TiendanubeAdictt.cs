@@ -10,8 +10,6 @@ namespace AdicttMAUI.REST
 {
     public static class TiendanubeAdictt
     {
-        static string _jsonResponse;
-
         public static async Task<List<Product>> GetAllProducts()
         {
             HttpClient client = new HttpClient();
@@ -163,7 +161,7 @@ namespace AdicttMAUI.REST
 
             objImage.id = long.Parse(jsonImage["id"].ToString());
             objImage.productId = long.Parse(jsonImage["product_id"].ToString());
-            objImage.source = jsonImage["src"].ToString();
+            objImage.imageSource = jsonImage["src"].ToString();
             objImage.position = int.Parse(jsonImage["position"].ToString());
             objImage.createdAt = DateTime.Parse(jsonImage["created_at"].ToString());
             objImage.updatedAt = DateTime.Parse(jsonImage["updated_at"].ToString());
