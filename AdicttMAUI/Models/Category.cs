@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,8 @@ namespace AdicttMAUI.Models
         public string title { get; set; }
         public string description { get; set; }
         public long parent { get; set; }
+
+        [ManyToMany(typeof(ProductCategory), CascadeOperations = CascadeOperation.All)]
+        public List<Product> products { get; set; }
     }
 }

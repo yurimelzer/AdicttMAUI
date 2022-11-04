@@ -22,6 +22,7 @@ public static class MauiProgram
 		builder.Services.AddSingleton(s => ActivatorUtilities.CreateInstance<ProductVariantRepository>(s, dbPath));
 		builder.Services.AddSingleton(s => ActivatorUtilities.CreateInstance<ProductImageRepository>(s, dbPath));
 		builder.Services.AddSingleton(s => ActivatorUtilities.CreateInstance<CategoryRepository>(s, dbPath));
+		builder.Services.AddSingleton(s => ActivatorUtilities.CreateInstance<ProductCategoryRepository>(s, dbPath));
 
 		return builder.Build();
 	}

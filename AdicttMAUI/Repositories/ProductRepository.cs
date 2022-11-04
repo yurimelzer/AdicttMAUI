@@ -1,5 +1,6 @@
 ﻿using AdicttMAUI.Models;
 using SQLite;
+using SQLiteNetExtensionsAsync.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +36,7 @@ namespace AdicttMAUI.Repositories
             try
             {
                 await Init();
-                return await (from product in sqlConnection.Table<Product>() orderby product.createdAt select product).ToListAsync();
+                return await sqlConnection.GetAllWithChildrenAsync<Product>();
             }
             catch (Exception ex)
             {
@@ -99,7 +100,7 @@ namespace AdicttMAUI.Repositories
             {
                 await Init();
 
-                await sqlConnection.UpdateAsync(product);
+                await sqlConnection.UpdateWithChildrenAsync(product);
 
                 StatusMessage = String.Format("Product {0} as been updated", product.id);
             }

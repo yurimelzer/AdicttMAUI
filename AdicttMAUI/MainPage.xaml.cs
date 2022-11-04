@@ -30,9 +30,32 @@ public partial class MainPage : ContentPage
 	private async void ProductDebugRepository()
 	{
 		List<Product> listProductApi = await TiendanubeAdictt.GetAllProducts();
-		List<ProductVariant> listVariantApi = await TiendanubeAdictt.GetAllProductVariants();
-		List<ProductImage> listImages = await TiendanubeAdictt.GetAllProductImages();
-		List<Category> category = await TiendanubeAdictt.GetAllCategories();
+
+		await App.ProductRepository.AddProducts(listProductApi);
+
+		List<Product> listProductDb = await App.ProductRepository.GetAllProduct();
+		List<ProductCategory> listProductCategory = await App.ProductCategoryRepository.GetAllProductCategories();
+
+		foreach (Product product in listProductApi)
+		{
+			await App.ProductImageRepository.AddProductImages(product.images);
+			await App.ProductVariantRepository.AddProductVariants(product.variants);
+
+			foreach(Category category in product.categories)
+			{
+				ProductCategory productCategory = new ProductCategory
+				{
+					productId = product.id,
+					categoryId = category.id
+				};
+
+				await App.ProductCategoryRepository.AddProductCategory(productCategory);
+			}
+		}
+
+		List<Category> listCategoryApi = await TiendanubeAdictt.GetAllCategories();
+
+		await App.CategoryRepository.AddCategories(listCategoryApi);
     }
 }
 

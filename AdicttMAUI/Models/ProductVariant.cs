@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace AdicttMAUI.Models
     {
         [PrimaryKey]
         public long id { get; set; }
+
+        [ForeignKey(typeof(Product))]
         public long produtctId { get; set; }
         public int position { get; set; }
         public double price { get; set; }

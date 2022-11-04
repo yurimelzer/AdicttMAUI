@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,15 +23,24 @@ namespace AdicttMAUI.Models
         public DateTime? updatedAt { get; set; }
         public string tags { get; set; }
 
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<ProductVariant> variants { get; set; }
+
+        [OneToMany(CascadeOperations = CascadeOperation.All)]
+        public List<ProductImage> images { get; set; }
+
+        [ManyToMany(typeof(ProductCategory), CascadeOperations = CascadeOperation.All)]
+        public List<Category> categories { get; set; }
+
         public override bool Equals(object obj)
         {
             var product = obj as Product;
             return this.id.Equals(product.id);
         }
 
-        public override int GetHashCode()
-        {
-            return Convert.ToInt32(this.id / 10);
-        }
+        //public override int GetHashCode()
+        //{
+        //    return Convert.ToInt32(this.id / 10);
+        //}
     }
 }

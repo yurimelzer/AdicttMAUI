@@ -9,8 +9,9 @@ public partial class App : Application
 	public static ProductVariantRepository ProductVariantRepository { get; set; }
 	public static ProductImageRepository ProductImageRepository { get; set; }
 	public static CategoryRepository CategoryRepository { get; set; }
+	public static ProductCategoryRepository ProductCategoryRepository { get; set; }
 
-	public App(ProductRepository productRepo, ProductVariantRepository productVariantRepo, ProductImageRepository productImageRepo, CategoryRepository caregoryRepo)
+	public App(ProductRepository productRepo, ProductVariantRepository productVariantRepo, ProductImageRepository productImageRepo, CategoryRepository caregoryRepo, ProductCategoryRepository productCategoryRepo)
 	{
 		InitializeComponent();
 
@@ -20,5 +21,6 @@ public partial class App : Application
 		ProductVariantRepository = productVariantRepo;
 		ProductImageRepository = productImageRepo;
 		CategoryRepository = caregoryRepo;
+		ProductCategoryRepository = productCategoryRepo;
     }
 }

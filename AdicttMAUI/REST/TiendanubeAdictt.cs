@@ -12,15 +12,7 @@ namespace AdicttMAUI.REST
     {
         static string _jsonResponse;
 
-        private static async Task Init()
-        {
-            if (!String.IsNullOrEmpty(_jsonResponse))
-                return;
-
-            _jsonResponse = await GetJsonResponse();
-        }
-
-        private static Task<string> GetJsonResponse()
+        public static async Task<List<Product>> GetAllProducts()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://api.tiendanube.com/v1/");
@@ -29,16 +21,11 @@ namespace AdicttMAUI.REST
 
             string url = "1573374/products";
             HttpResponseMessage response = client.GetAsync(url).Result;
-            return response.Content.ReadAsStringAsync();
-        }
-
-        public static async Task<List<Product>> GetAllProducts()
-        {
-            await Init();
+            string jsonResponse = await response.Content.ReadAsStringAsync();
 
             List<Product> listProduct = new List<Product>();
 
-            JArray jsonListProduct = JArray.Parse(_jsonResponse);
+            JArray jsonListProduct = JArray.Parse(jsonResponse);
 
             foreach (JObject jsonProduct in jsonListProduct)
             {
@@ -48,93 +35,69 @@ namespace AdicttMAUI.REST
             return listProduct;
         }
 
-        public static async Task<List<ProductVariant>> GetAllProductVariants()
-        {
-            await Init();
-
-            List<ProductVariant> listProductVariants = new List<ProductVariant>();
-
-            JArray jsonListProduct = JArray.Parse(_jsonResponse);
-
-            foreach (JObject jsonProduct in jsonListProduct)
-            {
-                JArray jsonListVariants = JArray.Parse(jsonProduct["variants"].ToString());
-                foreach (JObject jsonVariant in jsonListVariants)
-                {
-                    listProductVariants.Add(JsonToVariant(jsonVariant));
-                }
-            }
-
-            return listProductVariants;
-        }
-
         public static async Task<List<Category>> GetAllCategories()
         {
-            await Init();
+            HttpClient client = new HttpClient();
+            client.BaseAddress = new Uri("https://api.tiendanube.com/v1/");
+            client.DefaultRequestHeaders.Add("Authentication", "bearer c702a62983ee8b062e5cbdf78ef4d4d93df0b469");
+            client.DefaultRequestHeaders.Add("User-Agent", "Bruno");
+
+            string url = "1573374/categories";
+            HttpResponseMessage response = client.GetAsync(url).Result;
+            string jsonResponse = await response.Content.ReadAsStringAsync();
 
             List<Category> listCategory = new List<Category>();
 
-            JArray jsonListProduct = JArray.Parse(_jsonResponse);
+            JArray jsonCategories = JArray.Parse(jsonResponse);
 
-            foreach (JObject jsonProduct in jsonListProduct)
+            foreach (JObject categoria in jsonCategories)
             {
-                JArray jsonCategorias = JArray.Parse(jsonProduct["categories"].ToString());
-
-                foreach (JObject categoria in jsonCategorias)
-                {
-                    listCategory.Add(JsonToCategory(categoria));
-                }
+                listCategory.Add(JsonToCategory(categoria));
             }
 
             return listCategory;
         }
 
-        public static async Task<List<ProductImage>> GetAllProductImages()
-        {
-            await Init();
-
-            List<ProductImage> listProductImages = new List<ProductImage>();
-
-            JArray jsonListProduct = JArray.Parse(_jsonResponse);
-
-            foreach (JObject jsonProduct in jsonListProduct)
-            {
-                JArray jsonImages = JArray.Parse(jsonProduct["images"].ToString());
-
-                foreach (JObject image in jsonImages)
-                {
-                    listProductImages.Add(JsonToProductImage(image));
-                }
-
-            }
-
-            return listProductImages;
-        }
-
-        private static Product JsonToProduct(JObject jsonProduto)
+        private static Product JsonToProduct(JObject jsonProduct)
         {
             Product objProduto = new Product();
 
-            JArray jsonVariants = JArray.Parse(jsonProduto["variants"].ToString());
+            JArray jsonVariants = JArray.Parse(jsonProduct["variants"].ToString());
+            JArray jsonImages = JArray.Parse(jsonProduct["images"].ToString());
+            JArray jsonCategories = JArray.Parse(jsonProduct["categories"].ToString());
 
-            objProduto.id = long.Parse(jsonProduto["id"].ToString());
-            objProduto.name = jsonProduto["name"]["pt"].ToString();
-            objProduto.description = jsonProduto["description"].ToString();
+            objProduto.id = long.Parse(jsonProduct["id"].ToString());
+            objProduto.name = jsonProduct["name"]["pt"].ToString();
+            objProduto.description = jsonProduct["description"].ToString();
 
             int stock = 0;
 
+            objProduto.variants = new List<ProductVariant>();
             foreach (JObject variant in jsonVariants)
             {
                 stock += int.Parse(variant["stock"].ToString());
+                objProduto.variants.Add(JsonToVariant(variant));
+            }
+
+            objProduto.images = new List<ProductImage>();
+            foreach(JObject image in jsonImages)
+            {
+                objProduto.images.Add(JsonToProductImage(image));
+            }
+
+            objProduto.categories = new List<Category>();
+            foreach (JObject category in jsonCategories)
+            {
+                objProduto.categories.Add(JsonToCategory(category));
             }
 
             objProduto.stock = stock;
-            objProduto.specification = jsonProduto["seo_description"]["pt"].ToString();
-            objProduto.brand = jsonProduto["brand"].ToString();
-            objProduto.freeShipping = bool.Parse(jsonProduto["free_shipping"].ToString());
-            objProduto.createdAt = DateTime.Parse(jsonProduto["created_at"].ToString());
-            objProduto.updatedAt = DateTime.Parse(jsonProduto["updated_at"].ToString());
-            objProduto.tags = jsonProduto["tags"].ToString();
+            objProduto.specification = jsonProduct["seo_description"]["pt"].ToString();
+            objProduto.brand = jsonProduct["brand"].ToString();
+            objProduto.freeShipping = bool.Parse(jsonProduct["free_shipping"].ToString());
+            objProduto.createdAt = DateTime.Parse(jsonProduct["created_at"].ToString());
+            objProduto.updatedAt = DateTime.Parse(jsonProduct["updated_at"].ToString());
+            objProduto.tags = jsonProduct["tags"].ToString();
 
             return objProduto;
         }
@@ -204,6 +167,7 @@ namespace AdicttMAUI.REST
             objImage.position = int.Parse(jsonImage["position"].ToString());
             objImage.createdAt = DateTime.Parse(jsonImage["created_at"].ToString());
             objImage.updatedAt = DateTime.Parse(jsonImage["updated_at"].ToString());
+
             return objImage;
         }
     }
