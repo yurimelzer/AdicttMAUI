@@ -76,6 +76,23 @@ namespace AdicttMAUI.Repositories
             }
         }
 
+        public async Task AddProducts(List<Product> listProducts)
+        {
+            int result = 0;
+            try
+            {
+                await Init();
+
+                result = await sqlConnection.InsertAllAsync(listProducts);
+
+                StatusMessage = String.Format("{0} Product(s) has been added", result);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add Products. Error {0}", ex.Message);
+            }
+        }
+
         public async Task UpdateProduct(Product product)
         {
             try

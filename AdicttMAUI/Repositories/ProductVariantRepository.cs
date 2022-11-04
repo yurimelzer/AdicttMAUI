@@ -78,6 +78,23 @@ namespace AdicttMAUI.Repositories
             }
         }
 
+        public async Task AddProductVariants(List<ProductVariant> listProductVariants)
+        {
+            int result = 0;
+            try
+            {
+                await Init();
+
+                result = await sqlConnection.InsertAllAsync(listProductVariants);
+
+                StatusMessage = String.Format("{0} Product Variant(s) has been added", result);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add Product Variants. Error {0}", ex.Message);
+            }
+        }
+
         public async Task UpdateProductVariant(ProductVariant variant)
         {
             try

@@ -12,7 +12,7 @@ namespace AdicttMAUI.Repositories
     {
         string _dbPath;
 
-        public string StatusMassage { get; set; }
+        public string StatusMessage { get; set; }
 
         private SQLiteAsyncConnection sqlConnection;
 
@@ -40,7 +40,7 @@ namespace AdicttMAUI.Repositories
             }
             catch (Exception ex)
             {
-                StatusMassage = String.Format("Failed to Get all Categories. Error: {0}", ex.Message);
+                StatusMessage = String.Format("Failed to Get all Categories. Error: {0}", ex.Message);
             }
 
             return new List<Category>();
@@ -56,10 +56,27 @@ namespace AdicttMAUI.Repositories
             }
             catch (Exception ex)
             {
-                StatusMassage = String.Format("Failed to Get Category {0}. Error: {1}", id, ex.Message);
+                StatusMessage = String.Format("Failed to Get Category {0}. Error: {1}", id, ex.Message);
             }
 
             return new Category();
+        }
+
+        public async Task AddCategories(List<Category> listCategory)
+        {
+            int result = 0;
+            try
+            {
+                await Init();
+
+                result = await sqlConnection.InsertAllAsync(listCategory);
+
+                StatusMessage = String.Format("{0} Category(es) has been added", result);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add Categories. Error {0}", ex.Message);
+            }
         }
 
         public async Task AddCategory(Category category)
@@ -70,11 +87,11 @@ namespace AdicttMAUI.Repositories
 
                 await sqlConnection.InsertAsync(category);
 
-                StatusMassage = String.Format("Category {0} has been added", category.id);
+                StatusMessage = String.Format("Category {0} has been added", category.id);
             }
             catch (Exception ex)
             {
-                StatusMassage = String.Format("Failed to add Category {0}. Error: {1}", category.id, ex.Message);
+                StatusMessage = String.Format("Failed to add Category {0}. Error: {1}", category.id, ex.Message);
             }
         }
 
@@ -86,11 +103,11 @@ namespace AdicttMAUI.Repositories
 
                 await sqlConnection.UpdateAsync(category);
 
-                StatusMassage = String.Format("Category {0} has been updated", category.id);
+                StatusMessage = String.Format("Category {0} has been updated", category.id);
             }
             catch (Exception ex)
             {
-                StatusMassage = String.Format("Failed to update Category {0}. Error: {1}", category.id, ex.Message);
+                StatusMessage = String.Format("Failed to update Category {0}. Error: {1}", category.id, ex.Message);
             }
         }
 
@@ -102,11 +119,11 @@ namespace AdicttMAUI.Repositories
 
                 await sqlConnection.DeleteAsync<Category>(id);
 
-                StatusMassage = String.Format("Category {0} has been deleted", id);
+                StatusMessage = String.Format("Category {0} has been deleted", id);
             }
             catch (Exception ex)
             {
-                StatusMassage = String.Format("Failed to delete Category {0}. Error: {1}", id, ex.Message);
+                StatusMessage = String.Format("Failed to delete Category {0}. Error: {1}", id, ex.Message);
             }
         }
     }
