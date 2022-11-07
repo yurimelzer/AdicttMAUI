@@ -14,23 +14,26 @@ namespace AdicttMAUI.ViewModels
 
         public ProductViewModel()
         {
-            //this.GetApiData();
+            this.GetApiData();
 
             produtosCollection = App.ProductRepository.GetAllProduct();
         }
 
-        private async void GetApiData()
+        private void GetApiData()
         {
-            List<Product> listProductApi = await TiendanubeAdictt.GetAllProducts();
+            List<Product> listProductApi = TiendanubeAdictt.GetAllProducts();
 
-            await App.ProductRepository.AddProducts(listProductApi);
+            App.ProductCategoryRepository.DeleteAllProductCategory();
 
-            List<ProductCategory> listProductCategory = await App.ProductCategoryRepository.GetAllProductCategories();
+            //Excluir depois
+            App.ProductImageRepository.DeleteAllProductImages();
+
+            App.ProductRepository.AddProducts(listProductApi);
 
             foreach (Product product in listProductApi)
             {
-                await App.ProductImageRepository.AddProductImages(product.images);
-                await App.ProductVariantRepository.AddProductVariants(product.variants);
+                App.ProductImageRepository.AddProductImages(product.images);
+                App.ProductVariantRepository.AddProductVariants(product.variants);
 
                 foreach (Category category in product.categories)
                 {
@@ -40,13 +43,15 @@ namespace AdicttMAUI.ViewModels
                         categoryId = category.id
                     };
 
-                    await App.ProductCategoryRepository.AddProductCategory(productCategory);
+                    App.ProductCategoryRepository.AddProductCategory(productCategory);
                 }
             }
 
-            List<Category> listCategoryApi = await TiendanubeAdictt.GetAllCategories();
+            List<Category> listCategoryApi = TiendanubeAdictt.GetAllCategories();
 
-            await App.CategoryRepository.AddCategories(listCategoryApi);
+            App.CategoryRepository.AddCategoriesAsync(listCategoryApi);
+
+            produtosCollection = App.ProductRepository.GetAllProduct();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SQLiteNetExtensions.Attributes;
+﻿using SQLite;
+using SQLiteNetExtensions.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace AdicttMAUI.Models
 {
     public class ProductImage
     {
+        [PrimaryKey]
         public long id { get; set; }
 
         [ForeignKey(typeof(Product))]

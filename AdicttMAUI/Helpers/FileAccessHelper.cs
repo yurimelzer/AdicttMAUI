@@ -10,7 +10,7 @@ namespace AdicttMAUI.Helpers
     {
         public static string GetLocalFilePath(string fileName)
         {
-            return System.IO.Path.Combine(FileSystem.AppDataDirectory, fileName);
+            return System.IO.Path.Combine(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), fileName);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace AdicttMAUI.REST
 {
     public static class TiendanubeAdictt
     {
-        public static async Task<List<Product>> GetAllProducts()
+        public static List<Product> GetAllProducts()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://api.tiendanube.com/v1/");
@@ -19,7 +19,7 @@ namespace AdicttMAUI.REST
 
             string url = "1573374/products";
             HttpResponseMessage response = client.GetAsync(url).Result;
-            string jsonResponse = await response.Content.ReadAsStringAsync();
+            string jsonResponse = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
             List<Product> listProduct = new List<Product>();
 
@@ -33,7 +33,7 @@ namespace AdicttMAUI.REST
             return listProduct;
         }
 
-        public static async Task<List<Category>> GetAllCategories()
+        public static List<Category> GetAllCategories()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://api.tiendanube.com/v1/");
@@ -42,7 +42,7 @@ namespace AdicttMAUI.REST
 
             string url = "1573374/categories";
             HttpResponseMessage response = client.GetAsync(url).Result;
-            string jsonResponse = await response.Content.ReadAsStringAsync();
+            string jsonResponse = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
             List<Category> listCategory = new List<Category>();
 

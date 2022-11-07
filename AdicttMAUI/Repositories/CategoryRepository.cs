@@ -14,15 +14,26 @@ namespace AdicttMAUI.Repositories
 
         public string StatusMessage { get; set; }
 
-        private SQLiteAsyncConnection sqlConnection;
+        private SQLiteAsyncConnection sqlConnectionAsync;
 
-        private async Task Init()
+        private SQLiteConnection sqlConnection;
+
+        private void Init()
         {
             if (sqlConnection != null)
                 return;
 
-            sqlConnection = new SQLiteAsyncConnection(_dbPath);
-            await sqlConnection.CreateTableAsync<Category>();
+            sqlConnection = new SQLiteConnection(_dbPath);
+            sqlConnection.CreateTable<Category>();
+        }
+
+        private async Task InitAsync()
+        {
+            if (sqlConnectionAsync != null)
+                return;
+
+            sqlConnectionAsync = new SQLiteAsyncConnection(_dbPath);
+            await sqlConnectionAsync.CreateTableAsync<Category>();
         }
 
         public CategoryRepository(string dbPath)
@@ -34,9 +45,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await (from category in sqlConnection.Table<Category>() orderby category.title select category).ToListAsync();
+                return await (from category in sqlConnectionAsync.Table<Category>() orderby category.title select category).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -50,9 +61,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await sqlConnection.GetAsync<Category>(id);
+                return await sqlConnectionAsync.GetAsync<Category>(id);
             }
             catch (Exception ex)
             {
@@ -62,14 +73,32 @@ namespace AdicttMAUI.Repositories
             return new Category();
         }
 
-        public async Task AddCategories(List<Category> listCategory)
+        public void AddCategories(List<Category> listCategory)
         {
             int result = 0;
             try
             {
-                await Init();
+                Init();
 
-                result = await sqlConnection.InsertAllAsync(listCategory);
+                result = sqlConnection.InsertAll(listCategory);
+
+                StatusMessage = String.Format("{0} Category(es) has been added", result);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add Categories. Error {0}", ex.Message);
+            }
+        }
+
+
+        public async Task AddCategoriesAsync(List<Category> listCategory)
+        {
+            int result = 0;
+            try
+            {
+                await InitAsync();
+
+                result = await sqlConnectionAsync.InsertAllAsync(listCategory);
 
                 StatusMessage = String.Format("{0} Category(es) has been added", result);
             }
@@ -83,9 +112,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.InsertAsync(category);
+                await sqlConnectionAsync.InsertAsync(category);
 
                 StatusMessage = String.Format("Category {0} has been added", category.id);
             }
@@ -99,9 +128,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.UpdateAsync(category);
+                await sqlConnectionAsync.UpdateAsync(category);
 
                 StatusMessage = String.Format("Category {0} has been updated", category.id);
             }
@@ -115,9 +144,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.DeleteAsync<Category>(id);
+                await sqlConnectionAsync.DeleteAsync<Category>(id);
 
                 StatusMessage = String.Format("Category {0} has been deleted", id);
             }

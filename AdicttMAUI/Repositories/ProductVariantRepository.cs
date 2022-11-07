@@ -14,15 +14,26 @@ namespace AdicttMAUI.Repositories
 
         public string StatusMessage { get; set; }
 
-        private SQLiteAsyncConnection sqlConnection;
+        private SQLiteAsyncConnection sqlConnectionAsync;
 
-        private async Task Init()
+        private SQLiteConnection sqlConnection;
+
+        private async void Init()
         {
             if (sqlConnection != null)
                 return;
 
-            sqlConnection = new SQLiteAsyncConnection(_dbPath);
-            await sqlConnection.CreateTableAsync<ProductVariant>();
+            sqlConnection = new SQLiteConnection(_dbPath);
+            sqlConnection.CreateTable<ProductVariant>();
+        }
+
+        private async Task InitAsync()
+        {
+            if (sqlConnectionAsync != null)
+                return;
+
+            sqlConnectionAsync = new SQLiteAsyncConnection(_dbPath);
+            await sqlConnectionAsync.CreateTableAsync<ProductVariant>();
         }
 
         public ProductVariantRepository(string dbPath)
@@ -34,9 +45,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await (from productsVariant in sqlConnection.Table<ProductVariant>() orderby productsVariant.createdAt select productsVariant).ToListAsync();
+                return await (from productsVariant in sqlConnectionAsync.Table<ProductVariant>() orderby productsVariant.createdAt select productsVariant).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -50,9 +61,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await sqlConnection.GetAsync<ProductVariant>(id);
+                return await sqlConnectionAsync.GetAsync<ProductVariant>(id);
             }
             catch (Exception ex)
             {
@@ -66,9 +77,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.InsertAsync(variant);
+                await sqlConnectionAsync.InsertAsync(variant);
 
                 StatusMessage = String.Format("Product Variant {0} has been added", variant.id);
             }
@@ -78,14 +89,31 @@ namespace AdicttMAUI.Repositories
             }
         }
 
-        public async Task AddProductVariants(List<ProductVariant> listProductVariants)
+        public void AddProductVariants(List<ProductVariant> listProductVariants)
         {
             int result = 0;
             try
             {
-                await Init();
+                Init();
 
-                result = await sqlConnection.InsertAllAsync(listProductVariants);
+                result = sqlConnection.InsertAll(listProductVariants);
+
+                StatusMessage = String.Format("{0} Product Variant(s) has been added", result);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add Product Variants. Error {0}", ex.Message);
+            }
+        }
+
+        public async Task AddProductVariantsAsync(List<ProductVariant> listProductVariants)
+        {
+            int result = 0;
+            try
+            {
+                await InitAsync();
+
+                result = await sqlConnectionAsync.InsertAllAsync(listProductVariants);
 
                 StatusMessage = String.Format("{0} Product Variant(s) has been added", result);
             }
@@ -99,9 +127,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.UpdateAsync(variant);
+                await sqlConnectionAsync.UpdateAsync(variant);
 
                 StatusMessage = String.Format("Product Variant {0} has been updated", variant.id);
             }
@@ -115,9 +143,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.DeleteAsync<ProductVariant>(id);
+                await sqlConnectionAsync.DeleteAsync<ProductVariant>(id);
 
                 StatusMessage = String.Format("Product Variant {0} has been deleted", id);
             }

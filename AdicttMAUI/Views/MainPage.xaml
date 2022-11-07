@@ -15,35 +15,21 @@
                     <DataTemplate>
                         <ViewCell>
                             <ViewCell.View>
-                                <Frame 
-                                    BackgroundColor="Transparent">
-
-                                    <StackLayout>
-                                        <Label
-                                            Text="{Binding name}"
-                                            TextColor="Black"/>
-
-                                        <CarouselView
-                                            ItemsSource="{Binding images}">
-
-                                            <CarouselView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <StackLayout>
-                                                        <Frame
-                                                            BackgroundColor="Red">
-                                                            
-                                                            <Label Text="{Binding imageSource}">
-                                                            
-                                                            </Label>
-                                                        </Frame>
-
-                                                    </StackLayout>
-                                                </DataTemplate>
-                                            </CarouselView.ItemTemplate>
-                                            
-                                        </CarouselView>
-                                    </StackLayout>
-                                </Frame>
+                                <StackLayout>
+                                    
+                                    <Label
+                                        Text="{Binding name}"/>
+                                    
+                                    <Frame
+                                        WidthRequest="200"
+                                        HorizontalOptions="CenterAndExpand">
+                                        
+                                        <Image
+                                            Source="{Binding images[0].imageSource}"
+                                            Aspect="AspectFit"/>
+                                        
+                                    </Frame>
+                                </StackLayout>
                             </ViewCell.View>
                         </ViewCell>
                     </DataTemplate>

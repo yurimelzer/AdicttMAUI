@@ -13,15 +13,26 @@ namespace AdicttMAUI.Repositories
         string _dbPath;
         public string StatusMessage { get; set; }
 
-        private SQLiteAsyncConnection sqlConnection;
+        private SQLiteAsyncConnection sqlConnectionAsync;
         
-        private async Task Init()
+        private SQLiteConnection sqlConnection;
+
+        private void Init()
         {
             if (sqlConnection != null)
                 return;
 
-            sqlConnection = new SQLiteAsyncConnection(_dbPath);
-            await sqlConnection.CreateTableAsync<ProductCategory>();
+            sqlConnection = new SQLiteConnection(_dbPath);
+            sqlConnection.CreateTable<ProductCategory>();
+        }
+
+        private async Task InitAsync()
+        {
+            if (sqlConnectionAsync != null)
+                return;
+
+            sqlConnectionAsync = new SQLiteAsyncConnection(_dbPath);
+            await sqlConnectionAsync.CreateTableAsync<ProductCategory>();
         }
 
         public ProductCategoryRepository(string dbPath)
@@ -33,9 +44,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await sqlConnection.Table<ProductCategory>().ToListAsync();
+                return await sqlConnectionAsync.Table<ProductCategory>().ToListAsync();
             }
             catch (Exception ex)
             {
@@ -45,17 +56,45 @@ namespace AdicttMAUI.Repositories
             return new List<ProductCategory>();
         }
 
-        public async Task AddProductCategory(ProductCategory productCategory)
+        public void AddProductCategory(ProductCategory productCategory)
         {
             try
             {
-                await Init();
+                Init();
 
-                await sqlConnection.InsertAsync(productCategory);
+                sqlConnection.Insert(productCategory);
             }
             catch (Exception ex)
             {
                 StatusMessage = String.Format("Failed to add ProductCategory. Error: {0}", ex.Message);
+            }
+        }
+
+        public async Task AddProductCategoryAsync(ProductCategory productCategory)
+        {
+            try
+            {
+                await InitAsync();
+
+                await sqlConnectionAsync.InsertAsync(productCategory);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add ProductCategory. Error: {0}", ex.Message);
+            }
+        }
+
+        public void DeleteAllProductCategory()
+        {
+            try
+            {
+                Init();
+
+                sqlConnection.DeleteAll<Product>();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to Delete All ProductCategory. Error: {0}", ex.Message);
             }
         }
     }

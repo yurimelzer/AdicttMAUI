@@ -14,15 +14,26 @@ namespace AdicttMAUI.Repositories
 
         public string StatusMessage { get; set; }
 
-        private SQLiteAsyncConnection sqlConnection;
+        private SQLiteAsyncConnection sqlConnectionAsync;
 
-        private async Task Init()
+        private SQLiteConnection sqlConnection;
+
+        private void Init()
         {
             if (sqlConnection != null)
                 return;
 
-            sqlConnection = new SQLiteAsyncConnection(_dbPath);
-            await sqlConnection.CreateTableAsync<ProductImage>();
+            sqlConnection = new SQLiteConnection(_dbPath);
+            sqlConnection.CreateTable<ProductImage>();
+        }
+
+        private async Task InitAsync()
+        {
+            if (sqlConnectionAsync != null)
+                return;
+
+            sqlConnectionAsync = new SQLiteAsyncConnection(_dbPath);
+            await sqlConnectionAsync.CreateTableAsync<ProductImage>();
         }
 
         public ProductImageRepository(string dbPath)
@@ -34,9 +45,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await (from productImage in sqlConnection.Table<ProductImage>() orderby productImage.createdAt select productImage).ToListAsync();
+                return await (from productImage in sqlConnectionAsync.Table<ProductImage>() orderby productImage.createdAt select productImage).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -50,9 +61,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                return await sqlConnection.GetAsync<ProductImage>(id);
+                return await sqlConnectionAsync.GetAsync<ProductImage>(id);
             }
             catch (Exception ex)
             {
@@ -66,9 +77,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.InsertAsync(productImage);
+                await sqlConnectionAsync.InsertAsync(productImage);
 
                 StatusMessage = String.Format("Product Image {0} has been added", productImage.id);
             }
@@ -78,14 +89,31 @@ namespace AdicttMAUI.Repositories
             }
         }
 
-        public async Task AddProductImages(List<ProductImage> listProductImage)
+        public void AddProductImages(List<ProductImage> listProductImage)
         {
             int result = 0;
             try
             {
-                await Init();
+                Init();
 
-                result = await sqlConnection.InsertAllAsync(listProductImage);
+                result = sqlConnection.InsertAll(listProductImage);
+
+                StatusMessage = String.Format("{0} Product Images(s) has been added", result);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to add Product Images. Error {0}", ex.Message);
+            }
+        }
+
+        public async Task AddProductImagesAsync(List<ProductImage> listProductImage)
+        {
+            int result = 0;
+            try
+            {
+                await InitAsync();
+
+                result = await sqlConnectionAsync.InsertAllAsync(listProductImage);
 
                 StatusMessage = String.Format("{0} Product Images(s) has been added", result);
             }
@@ -99,9 +127,9 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.UpdateAsync(productImage);
+                await sqlConnectionAsync.UpdateAsync(productImage);
 
                 StatusMessage = String.Format("Product Image {0} has been update", productImage.id);
             }
@@ -115,15 +143,29 @@ namespace AdicttMAUI.Repositories
         {
             try
             {
-                await Init();
+                await InitAsync();
 
-                await sqlConnection.DeleteAsync<ProductImage>(id);
+                await sqlConnectionAsync.DeleteAsync<ProductImage>(id);
 
                 StatusMessage = String.Format("Product Image {0} has been deleted", id);
             }
             catch (Exception ex)
             {
                 StatusMessage = String.Format("Failed to delete Product Image {0}. Error: {1}", id, ex.Message);
+            }
+        }
+
+        public void DeleteAllProductImages()
+        {
+            try
+            {
+                Init();
+
+                sqlConnection.DeleteAll<ProductImage>();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = String.Format("Failed to delete All Product Images. Error: {0}", ex.Message);
             }
         }
 
