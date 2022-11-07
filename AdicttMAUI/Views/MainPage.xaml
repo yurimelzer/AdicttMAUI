@@ -3,38 +3,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:AdicttMAUI.Models"
              xmlns:vm="clr-namespace:AdicttMAUI.ViewModels"
+             NavigationPage.HasNavigationBar="False"
              x:Class="AdicttMAUI.Views.MainPage">
 
     <ContentPage.Content>
         <StackLayout>
-            <ListView 
-                ItemsSource="{Binding produtosCollection}"
-                HasUnevenRows="True">
-
-                <ListView.ItemTemplate>
+            <CollectionView 
+                ItemsSource="{Binding produtosCollection}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout   Orientation="Horizontal" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <ViewCell>
-                            <ViewCell.View>
-                                <StackLayout>
+                        <StackLayout
+                            Margin="20"
+                            WidthRequest="150">
                                     
-                                    <Label
-                                        Text="{Binding name}"/>
+                            <Label
+                                Text="{Binding name}"
+                                HorizontalTextAlignment="Center"/>
                                     
-                                    <Frame
-                                        WidthRequest="200"
-                                        HorizontalOptions="CenterAndExpand">
+                            <Frame
+                                WidthRequest="150"
+                                HeightRequest="150"
+                                HorizontalOptions="CenterAndExpand">
                                         
-                                        <Image
-                                            Source="{Binding images[0].imageSource}"
-                                            Aspect="AspectFit"/>
+                                <Image
+                                    Source="{Binding images[0].imageSource}"
+                                    Aspect="AspectFit"/>
                                         
-                                    </Frame>
-                                </StackLayout>
-                            </ViewCell.View>
-                        </ViewCell>
+                            </Frame>
+                        </StackLayout>
                     </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
