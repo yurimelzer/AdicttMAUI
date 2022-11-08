@@ -1,4 +1,5 @@
-﻿using AdicttMAUI.Models;
+﻿using AdicttMAUI.Helpers;
+using AdicttMAUI.Models;
 using SQLite;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,24 @@ namespace AdicttMAUI.Repositories
             catch (Exception ex)
             {
                 StatusMessage = String.Format("Failed to Get all Product Images. Error: {0}", ex.Message);
+            }
+
+            return new List<ProductImage>();
+        }
+
+        public List<ProductImage> GetRandomImages()
+        {
+            try
+            {
+                Init();
+
+                List<ProductImage> listProductImage = (from productImage in sqlConnection.Table<ProductImage>() select productImage).ToList();
+                listProductImage.Shuffle();
+                return listProductImage.GetRange(listProductImage.Count - 3, 3);
+            }
+            catch (Exception ex)
+            {
+
             }
 
             return new List<ProductImage>();

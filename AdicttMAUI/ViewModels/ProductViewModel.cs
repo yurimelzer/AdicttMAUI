@@ -12,23 +12,22 @@ namespace AdicttMAUI.ViewModels
     {
         public List<Product> produtosCollection { get; private set; }
 
+        public List<object> drops { get; private set; }
+
         public ProductViewModel()
         {
-            this.GetApiData();
-
-            produtosCollection = App.ProductRepository.GetAllProduct();
+            Init();
         }
 
-        private void GetApiData()
+        private async void Init()
         {
-            List<Product> listProductApi = TiendanubeAdictt.GetAllProducts();
+            List<Product> listProductApi = await TiendanubeAdictt.GetAllProducts();
+            List<Category> listCategoryApi = await TiendanubeAdictt.GetAllCategories();
 
             App.ProductCategoryRepository.DeleteAllProductCategory();
 
-            //Excluir depois
-            App.ProductImageRepository.DeleteAllProductImages();
-
             App.ProductRepository.AddProducts(listProductApi);
+            App.CategoryRepository.AddCategories(listCategoryApi);
 
             foreach (Product product in listProductApi)
             {
@@ -47,11 +46,13 @@ namespace AdicttMAUI.ViewModels
                 }
             }
 
-            List<Category> listCategoryApi = TiendanubeAdictt.GetAllCategories();
-
-            App.CategoryRepository.AddCategoriesAsync(listCategoryApi);
-
             produtosCollection = App.ProductRepository.GetAllProduct();
+
+            drops = new List<object>
+            {
+                new { source = "https://d2r9epyceweg5n.cloudfront.net/stores/001/573/374/themes/amazonas/1-slide-1658883886247-7850662981-68da9c5b5ff0752338ee02c0644561671658883889-1024-1024.webp?2119636346" },
+                new { source ="https://d2r9epyceweg5n.cloudfront.net/stores/001/573/374/themes/amazonas/1-slide-1644253915918-8288848822-e0511b53dd3fff458086e03e840bfdda1644253918-1024-1024.webp?2119636346" }
+            };
         }
     }
 }

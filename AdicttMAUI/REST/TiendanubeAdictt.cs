@@ -10,7 +10,7 @@ namespace AdicttMAUI.REST
 {
     public static class TiendanubeAdictt
     {
-        public static List<Product> GetAllProducts()
+        public static async Task<List<Product>> GetAllProducts()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://api.tiendanube.com/v1/");
@@ -19,7 +19,7 @@ namespace AdicttMAUI.REST
 
             string url = "1573374/products";
             HttpResponseMessage response = client.GetAsync(url).Result;
-            string jsonResponse = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            string jsonResponse = await response.Content.ReadAsStringAsync();
 
             List<Product> listProduct = new List<Product>();
 
@@ -33,7 +33,7 @@ namespace AdicttMAUI.REST
             return listProduct;
         }
 
-        public static List<Category> GetAllCategories()
+        public static async Task<List<Category>> GetAllCategories()
         {
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri("https://api.tiendanube.com/v1/");
@@ -42,7 +42,7 @@ namespace AdicttMAUI.REST
 
             string url = "1573374/categories";
             HttpResponseMessage response = client.GetAsync(url).Result;
-            string jsonResponse = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            string jsonResponse = await response.Content.ReadAsStringAsync();
 
             List<Category> listCategory = new List<Category>();
 
@@ -159,10 +159,9 @@ namespace AdicttMAUI.REST
         {
             ProductImage objImage = new ProductImage();
 
-            objImage.id = long.Parse(jsonImage["id"].ToString());
+            objImage.id = long.Parse(jsonImage["position"].ToString() + jsonImage["id"].ToString());
             objImage.productId = long.Parse(jsonImage["product_id"].ToString());
             objImage.imageSource = jsonImage["src"].ToString();
-            objImage.position = int.Parse(jsonImage["position"].ToString());
             objImage.createdAt = DateTime.Parse(jsonImage["created_at"].ToString());
             objImage.updatedAt = DateTime.Parse(jsonImage["updated_at"].ToString());
 
