@@ -5,6 +5,7 @@
              xmlns:vm="clr-namespace:AdicttMAUI.ViewModels"
              Shell.NavBarIsVisible="False"
              ControlTemplate="{StaticResource baseTemplate}"
+             x:Name="mainPage"
              x:Class="AdicttMAUI.Views.MainPage">
 
     <ContentPage.Content>
@@ -30,33 +31,48 @@
                     Spacing="10">
                     <StackLayout>
                         <Frame
-                        Style="{StaticResource roundFrame}">
+                            Style="{StaticResource roundFrame}">
 
                         </Frame>
+                        <Label 
+                            Text="Camisas"
+                            HorizontalTextAlignment="Center"/>
                     </StackLayout>
                     <StackLayout>
                         <Frame
-                        Style="{StaticResource roundFrame}">
+                            Style="{StaticResource roundFrame}">
 
                         </Frame>
+                        <Label 
+                            Text="Bermudas"
+                            HorizontalTextAlignment="Center"/>
                     </StackLayout>
                     <StackLayout>
                         <Frame
-                        Style="{StaticResource roundFrame}">
+                            Style="{StaticResource roundFrame}">
 
                         </Frame>
+                        <Label 
+                            Text="Calças"
+                            HorizontalTextAlignment="Center"/>
                     </StackLayout>
                     <StackLayout>
                         <Frame
-                        Style="{StaticResource roundFrame}">
+                            Style="{StaticResource roundFrame}">
 
                         </Frame>
+                        <Label 
+                            Text="Moletom"
+                            HorizontalTextAlignment="Center"/>
                     </StackLayout>
                     <StackLayout>
                         <Frame
-                        Style="{StaticResource roundFrame}">
+                            Style="{StaticResource roundFrame}">
 
                         </Frame>
+                        <Label 
+                            Text="Acessórios"
+                            HorizontalTextAlignment="Center"/>
                     </StackLayout>
 
                 </StackLayout>
@@ -82,6 +98,12 @@
                                 <Image
                                     Source="{Binding images[0].imageSource}"
                                     Aspect="AspectFill"/>
+
+                                <Frame.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding BindingContext.goToProduct, Source={x:Reference mainPage}}"
+                                        CommandParameter="{Binding .}"/>
+                                </Frame.GestureRecognizers>
                                         
                             </Frame>
                             
